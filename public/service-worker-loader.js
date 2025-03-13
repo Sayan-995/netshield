@@ -1,9 +1,10 @@
 let latestAIResponse = null;
-
+const BASE_API_URL=`https://generativelanguage.googleapis.com/v1beta/models/`
+const API_KEY=`AIzaSyCUFIqU7V9jQMmr69kXuVkQh38W4Xzsuho`
 // Function to process comment with AI
 async function processCommentWithAI(comment) {
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyCUFIqU7V9jQMmr69kXuVkQh38W4Xzsuho`, {
+    const response = await fetch(`${BASE_API_URL}gemini-2.0-flash:generateContent?key=${API_KEY}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -49,6 +50,34 @@ Be extremely precise - only flag comments containing clear examples of hate spee
   }
 }
 
+const imagePrompt=``
+
+async function processImageWithAI(image){
+  const reqBody={
+    content:[
+      {
+        parts:[
+          {text: imagePrompt},
+          {inlineData:{mimetype:"image/png",data:base64Image}}
+        ]
+      }
+    ]
+  }
+  try{
+    const response=await fetch(`${BASE_API_URL}gemini-pro-vision:generateContent?key=${API_KEY}`,{
+      method: "POST",
+      headers: {
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify(reqBody)
+    })
+    const result =await response.json();
+    return result;
+  }catch(error){
+    console.error("AI processing error:", error);
+    return "Error processing with AI";
+  }
+}
 
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
